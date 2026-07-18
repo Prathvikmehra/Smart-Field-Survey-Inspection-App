@@ -54,12 +54,11 @@
         {
           "photosPermission": "Allow Smart Survey to save photos to your gallery.",
           "savePhotosPermission": "Allow Smart Survey to save photos to your gallery.",
-          "isAccessMediaLocationEnabled": true,
+          "isAccessMediaLocationEnabled": false,
           "androidPermissions": [
             "READ_EXTERNAL_STORAGE",
             "WRITE_EXTERNAL_STORAGE",
-            "READ_MEDIA_IMAGES",
-            "READ_MEDIA_VIDEO"
+            "READ_MEDIA_IMAGES"
           ]
         }
       ],

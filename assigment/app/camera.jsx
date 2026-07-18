@@ -33,18 +33,15 @@ export default function CameraScreen() {
   // Save photo to gallery function
   const savePhotoToGallery = async (uri) => {
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync(false); // false = don't ask for audio
-      if (status !== 'granted') {
-        Alert.alert("Permission needed", "Please grant media library permission to save photos");
-        return false;
-      }
-
       await MediaLibrary.saveToLibraryAsync(uri);
       Alert.alert("Success", "Photo saved to gallery!");
       return true;
     } catch (e) {
       console.error("Failed to save photo:", e);
-      Alert.alert("Error", "Failed to save photo to gallery");
+      Alert.alert(
+        "Error", 
+        "Failed to save photo. Please ensure you've granted storage permissions in your device settings."
+      );
       return false;
     }
   };
