@@ -106,7 +106,7 @@ export function SurveyProvider({ children }) {
   }
 
   return (
-    <SurveyContext.Provider value={{ surveys, addSurvey, deleteSurvey, editSurvey, getSurvey, pendingPhoto, setPendingPhoto, loading }}>
+    <SurveyContext.Provider value={{ surveys, setSurveys, addSurvey, deleteSurvey, editSurvey, getSurvey, pendingPhoto, setPendingPhoto, loading }}>
       {children}
     </SurveyContext.Provider>
   );

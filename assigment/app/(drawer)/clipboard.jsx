@@ -80,7 +80,7 @@ export default function ClipboardScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  body: { padding: 20 },
+  body: { padding: 20, paddingBottom: 40 },
   card: { borderRadius: 16, borderWidth: 1, overflow: "hidden", marginBottom: 30, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 10, elevation: 2 },
   cardHeader: { flexDirection: "row", alignItems: "center", padding: 16, borderBottomWidth: 1 },
   cardTitle: { flex: 1, fontSize: 16, fontWeight: "bold", marginLeft: 10 },
