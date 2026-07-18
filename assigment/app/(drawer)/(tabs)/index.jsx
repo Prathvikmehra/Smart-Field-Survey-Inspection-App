@@ -6,7 +6,6 @@ import SurveySummaryCard from "@/components/SurveySummaryCard";
 import { useTheme } from "@/context/ThemeContext";
 import { useSurveys } from "@/context/SurveyContext";
 
-// Returns a greeting based on current hour
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Good Morning";
@@ -19,7 +18,6 @@ export default function Dashboard() {
   const { colors, isDark } = useTheme();
   const { surveys, loading } = useSurveys();
 
-  // Get first 3 surveys as recent
   const recentSurveys = surveys.slice(0, 3);
 
   return (
@@ -27,27 +25,20 @@ export default function Dashboard() {
       style={[styles.container, { backgroundColor: colors.background }]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header — hamburger opens the drawer */}
       <AppHeader />
 
       <View style={styles.content}>
-        {/* Greeting + Student Details */}
         <Text style={[styles.greeting, { color: colors.text }]}>{getGreeting()}</Text>
         <Text style={[styles.name, { color: colors.text }]}>Prathvik Mehra</Text>
         <Text style={[styles.enrollment, { color: colors.gray }]}>Enrollment No: 23CS001</Text>
 
-        {/* Today's Survey Count */}
         <View style={[styles.countCard, { backgroundColor: colors.primary }]}>
           <Text style={[styles.countLabel, { color: isDark ? "#C7D2FE" : "#BFDBFE" }]}>
-            Today's Surveys
+            Total Surveys
           </Text>
           <Text style={styles.countNumber}>{surveys.length}</Text>
-          <Text style={[styles.countSub, { color: isDark ? "#C7D2FE" : "#BFDBFE" }]}>
-            Total surveys
-          </Text>
         </View>
 
-        {/* Quick Action Cards */}
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Quick Actions</Text>
         <View style={styles.grid}>
           <QuickActionCard
@@ -76,7 +67,6 @@ export default function Dashboard() {
           />
         </View>
 
-        {/* Recent Surveys */}
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Surveys</Text>
         {loading ? (
           <View style={styles.center}>
@@ -97,48 +87,44 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    padding: 16,
     paddingBottom: 40,
   },
   greeting: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginTop: 4,
-  },
-  name: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "600",
     marginTop: 4,
   },
+  name: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginTop: 2,
+  },
   enrollment: {
-    fontSize: 14,
+    fontSize: 13,
     marginTop: 2,
     marginBottom: 4,
   },
   countCard: {
-    borderRadius: 20,
-    padding: 22,
-    marginTop: 20,
+    borderRadius: 14,
+    padding: 18,
+    marginTop: 16,
     marginBottom: 4,
   },
   countLabel: {
-    fontSize: 15,
+    fontSize: 14,
   },
   countNumber: {
     color: "white",
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: "bold",
-    lineHeight: 56,
-  },
-  countSub: {
-    fontSize: 13,
-    marginTop: 2,
+    lineHeight: 44,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 24,
-    marginBottom: 14,
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 10,
   },
   grid: {
     flexDirection: "row",
@@ -152,7 +138,7 @@ const styles = StyleSheet.create({
   },
   noData: {
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 14,
     marginTop: 10,
   },
 });

@@ -5,17 +5,17 @@ import { useSurveys } from "@/context/SurveyContext";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Settings() {
-  const { colors, theme, toggleTheme, isDark } = useTheme();
+  const { colors, toggleTheme, isDark } = useTheme();
   const { surveys, setSurveys } = useSurveys();
 
   function handleClearAllSurveys() {
     Alert.alert(
-      "Confirm Clear All",
-      "Are you sure you want to delete all surveys? This cannot be undone.",
+      "Confirm",
+      "Delete all surveys? This can't be undone.",
       [
         { text: "Cancel", style: "cancel" },
         { 
-          text: "Delete All", 
+          text: "Delete", 
           style: "destructive", 
           onPress: () => setSurveys([]) 
         }
@@ -32,7 +32,7 @@ export default function Settings() {
       >
         <View style={styles.itemLeft}>
           <View style={[styles.iconBox, { backgroundColor: colors.primary + "15" }]}>
-            <Ionicons name={icon} size={20} color={colors.primary} />
+            <Ionicons name={icon} size={18} color={colors.primary} />
           </View>
           <Text style={[styles.itemLabel, { color: colors.text }]}>{label}</Text>
         </View>
@@ -47,7 +47,7 @@ export default function Settings() {
             thumbColor={"white"}
           />
         ) : (
-          <Ionicons name="chevron-forward" size={20} color={colors.gray} />
+          <Ionicons name="chevron-forward" size={18} color={colors.gray} />
         )}
       </Pressable>
     );
@@ -64,7 +64,7 @@ export default function Settings() {
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.gray }]}>Appearance</Text>
         <SettingsItem 
-          icon={isDark ? "moon" : "sunny"} 
+          icon={isDark ? "sunny" : "moon"} 
           label="Dark Mode" 
           switchValue={isDark}
           onSwitchChange={toggleTheme}
@@ -88,10 +88,6 @@ export default function Settings() {
           label="Version"
           value="1.0.0"
         />
-        <SettingsItem 
-          icon="code-slash-outline" 
-          label="Smart Field Survey App"
-        />
       </View>
     </ScrollView>
   );
@@ -100,31 +96,31 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { paddingBottom: 40 },
-  section: { marginTop: 24, paddingHorizontal: 16 },
+  section: { marginTop: 20, paddingHorizontal: 16 },
   sectionTitle: { 
-    fontSize: 13, 
-    fontWeight: "700", 
-    marginBottom: 8, 
+    fontSize: 12, 
+    fontWeight: "600", 
+    marginBottom: 6, 
     marginLeft: 4,
     textTransform: "uppercase",
-    letterSpacing: 0.5
+    letterSpacing: 0.4
   },
   item: { 
     flexDirection: "row", 
     alignItems: "center", 
     justifyContent: "space-between", 
-    paddingHorizontal: 16, 
-    paddingVertical: 14,
+    paddingHorizontal: 14, 
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
-  itemLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  itemLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
   iconBox: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
-  itemLabel: { fontSize: 15, fontWeight: "500" },
-  itemValue: { fontSize: 14, fontWeight: "500" }
+  itemLabel: { fontSize: 14, fontWeight: "500" },
+  itemValue: { fontSize: 13, fontWeight: "500" }
 });

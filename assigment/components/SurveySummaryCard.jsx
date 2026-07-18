@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useTheme } from "@/context/ThemeContext";
+import { useRouter } from "expo-router";
 
-// Displays a single survey summary with site, client, date, priority badge and status
-// Props: survey — { site, client, priority, date, status }
 export default function SurveySummaryCard({ survey }) {
+  const router = useRouter();
   const { colors } = useTheme();
   const priorityMap = {
     High: colors.danger,
@@ -13,8 +13,10 @@ export default function SurveySummaryCard({ survey }) {
   const badgeColor = priorityMap[survey.priority] || colors.gray;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card }]}>
-      {/* Top row — site name + priority badge */}
+    <Pressable 
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={() => router.push(`/preview?id=${survey.id}`)}
+    >
       <View style={styles.row}>
         <Text style={[styles.site, { color: colors.text }]} numberOfLines={1}>
           {survey.site}
@@ -24,71 +26,65 @@ export default function SurveySummaryCard({ survey }) {
         </View>
       </View>
 
-      {/* Client and date */}
       <Text style={[styles.detail, { color: colors.gray }]}>{survey.client}</Text>
       <Text style={[styles.detail, { color: colors.gray }]}>{survey.date}</Text>
 
-      {/* Status */}
-      <View style={[styles.statusBadge, { backgroundColor: badgeColor + "20" }]}>
+      <View style={[styles.statusBadge, { backgroundColor: badgeColor + "15" }]}>
         <Text style={[styles.statusText, { color: badgeColor }]}>{survey.status}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
   },
 
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 6,
   },
 
   site: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 15,
+    fontWeight: "600",
     flex: 1,
     marginRight: 8,
   },
 
   badge: {
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
 
   badgeText: {
     color: "white",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
   },
 
   detail: {
-    fontSize: 14,
+    fontSize: 13,
     marginBottom: 4,
   },
 
   statusBadge: {
     alignSelf: "flex-start",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    borderRadius: 16,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     marginTop: 6,
   },
 
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "600",
   },
 });
