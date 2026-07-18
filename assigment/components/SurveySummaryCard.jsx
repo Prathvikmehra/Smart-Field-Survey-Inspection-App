@@ -25,8 +25,8 @@ export default function SurveySummaryCard({ survey }) {
       </View>
 
       {/* Client and date */}
-      <Text style={[styles.detail, { color: colors.gray }]}>👤 {survey.client}</Text>
-      <Text style={[styles.detail, { color: colors.gray }]}>📅 {survey.date}</Text>
+      <Text style={[styles.detail, { color: colors.gray }]}>{survey.client}</Text>
+      <Text style={[styles.detail, { color: colors.gray }]}>{survey.date}</Text>
 
       {/* Status */}
       <View style={[styles.statusBadge, { backgroundColor: badgeColor + "20" }]}>

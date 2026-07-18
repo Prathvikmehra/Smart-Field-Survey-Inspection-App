@@ -32,7 +32,7 @@ export default function Dashboard() {
 
       <View style={styles.content}>
         {/* Greeting + Student Details */}
-        <Text style={[styles.greeting, { color: colors.text }]}>{getGreeting()} 👋</Text>
+        <Text style={[styles.greeting, { color: colors.text }]}>{getGreeting()}</Text>
         <Text style={[styles.name, { color: colors.text }]}>Prathvik Mehra</Text>
         <Text style={[styles.enrollment, { color: colors.gray }]}>Enrollment No: 23CS001</Text>
 
@@ -43,7 +43,7 @@ export default function Dashboard() {
           </Text>
           <Text style={styles.countNumber}>{surveys.length}</Text>
           <Text style={[styles.countSub, { color: isDark ? "#C7D2FE" : "#BFDBFE" }]}>
-            ✅ Total surveys
+            Total surveys
           </Text>
         </View>
 

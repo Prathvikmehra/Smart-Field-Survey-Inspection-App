@@ -87,7 +87,7 @@ export default function CreateSurvey() {
       };
       editSurvey(updatedSurvey);
       Alert.alert(
-        "✅ Survey Updated!",
+        "Survey Updated",
         `Survey ID: ${editId} has been updated.`,
         [
           { text: "View Details", onPress: () => {
@@ -116,7 +116,7 @@ export default function CreateSurvey() {
       addSurvey(newSurvey);
 
       Alert.alert(
-        "✅ Survey Created!",
+        "Survey Created",
         `Survey ID: ${surveyId} has been added.`,
         [
           { text: "View Details", onPress: () => {
@@ -277,7 +277,7 @@ export default function CreateSurvey() {
 
         <Text style={[styles.label, { color: colors.text }]}>Date</Text>
         <View style={[styles.dateBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.dateText, { color: colors.text }]}>📅  {today}</Text>
+          <Text style={[styles.dateText, { color: colors.text }]}>{today}</Text>
         </View>
 
         <Pressable

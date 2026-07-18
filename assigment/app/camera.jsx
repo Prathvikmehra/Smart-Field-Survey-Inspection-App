@@ -14,27 +14,24 @@ import * as MediaLibrary from "expo-media-library";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
 import { useSurveys } from "@/context/SurveyContext";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function CameraScreen() {
   const router = useRouter();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const { setPendingPhoto } = useSurveys();
 
-  // expo-camera permission hook
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-
-  // UI states
-  const [loading, setLoading] = useState(false); // capturing in progress
-  const [photo, setPhoto] = useState(null); // URI of captured photo
-  const [captureTime, setCaptureTime] = useState(null); // timestamp of capture
+  const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [captureTime, setCaptureTime] = useState(null);
 
   const cameraRef = useRef(null);
 
-  // Save photo to gallery function
   const savePhotoToGallery = async (uri) => {
     try {
       await MediaLibrary.saveToLibraryAsync(uri);
-      Alert.alert("Success", "Photo saved to gallery!");
+      Alert.alert("Success", "Photo saved to gallery");
       return true;
     } catch (e) {
       console.error("Failed to save photo:", e);
@@ -46,36 +43,40 @@ export default function CameraScreen() {
     }
   };
 
-  // ── 1. Waiting for permission decision ──────────────────────────────────────
   if (!cameraPermission) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: colors.background }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={[styles.loadingText, { color: colors.gray }]}>Loading camera...</Text>
+      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={[styles.text, { color: colors.gray }]}>Loading camera</Text>
+        </View>
       </SafeAreaView>
     );
   }
 
-  // ── 2. Permission denied — show rationale + grant button ────────────────────
   if (!cameraPermission.granted) {
     return (
-      <SafeAreaView style={[styles.center, { backgroundColor: colors.background }]}>
-        <Text style={styles.permEmoji}>📷</Text>
-        <Text style={[styles.permTitle, { color: colors.text }]}>Camera Permission Required</Text>
-        <Text style={[styles.permSub, { color: colors.gray }]}>
-          We need access to your camera to capture survey photos.
-        </Text>
-        <Pressable style={[styles.btn, { backgroundColor: colors.primary }]} onPress={requestCameraPermission}>
-          <Text style={styles.btnText}>Grant Permission</Text>
-        </Pressable>
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.gray }]}>← Go Back</Text>
-        </Pressable>
+      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+        <View style={styles.center}>
+          <Ionicons name="camera" size={64} color={colors.primary} />
+          <Text style={[styles.title, { color: colors.text }]}>Camera Permission Required</Text>
+          <Text style={[styles.subtitle, { color: colors.gray }]}>
+            We need access to your camera to capture survey photos.
+          </Text>
+          <Pressable 
+            style={[styles.primaryButton, { backgroundColor: colors.primary }]} 
+            onPress={requestCameraPermission}
+          >
+            <Text style={styles.buttonText}>Grant Permission</Text>
+          </Pressable>
+          <Pressable style={styles.secondaryButton} onPress={() => router.back()}>
+            <Text style={[styles.secondaryButtonText, { color: colors.gray }]}>Go Back</Text>
+          </Pressable>
+        </View>
       </SafeAreaView>
     );
   }
 
-  // ── Capture photo ─────────────────────────────────────────────────────────
   async function takePhoto() {
     if (!cameraRef.current) return;
     setLoading(true);
@@ -91,7 +92,6 @@ export default function CameraScreen() {
     }
   }
 
-  // ── Delete photo with confirmation ────────────────────────────────────────
   function handleDelete() {
     Alert.alert(
       "Delete Photo",
@@ -110,150 +110,216 @@ export default function CameraScreen() {
     );
   }
 
-  // ── Retake — simply clear photo state ────────────────────────────────────
   function handleRetake() {
     setPhoto(null);
     setCaptureTime(null);
   }
 
-  // ── 3. Preview mode — show captured image ─────────────────────────────────
   if (photo) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        {/* Header */}
-        <View style={[styles.header, { backgroundColor: colors.accent }]}>
-          <Text style={styles.headerTitle}>📸 Photo Preview</Text>
+      <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+        <View style={styles.previewHeader}>
+          <Pressable onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Photo Preview</Text>
+          <View style={{ width: 24 }} />
         </View>
 
-        {/* Photo */}
-        <Image source={{ uri: photo }} style={styles.preview} resizeMode="cover" />
+        <Image source={{ uri: photo }} style={styles.previewImage} resizeMode="cover" />
 
-        {/* Capture time */}
-        <Text style={[styles.timeText, { color: colors.gray }]}>🕐 Captured: {captureTime}</Text>
-
-        {/* Action buttons */}
-        <View style={styles.row}>
-          <Pressable
-            style={[styles.btn, { backgroundColor: colors.primary }]}
+        <View style={styles.previewActions}>
+          <Pressable 
+            style={[styles.actionButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
             onPress={handleRetake}
           >
-            <Text style={styles.btnText}>🔄 Retake</Text>
+            <Ionicons name="refresh" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.text }]}>Retake</Text>
           </Pressable>
-          <Pressable
-            style={[styles.btn, { backgroundColor: colors.danger }]}
+          
+          <Pressable 
+            style={[styles.actionButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
+            onPress={async () => {
+              await savePhotoToGallery(photo);
+            }}
+          >
+            <Ionicons name="download" size={20} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.text }]}>Save</Text>
+          </Pressable>
+          
+          <Pressable 
+            style={[styles.actionButton, { backgroundColor: colors.card, borderColor: colors.border }]} 
             onPress={handleDelete}
           >
-            <Text style={styles.btnText}>🗑️ Delete</Text>
+            <Ionicons name="trash" size={20} color={colors.danger} />
+            <Text style={[styles.actionButtonText, { color: colors.danger }]}>Delete</Text>
           </Pressable>
         </View>
 
-        <Pressable
-          style={[styles.btn, { backgroundColor: colors.success, marginHorizontal: 16, marginBottom: 8 }]}
-          onPress={async () => {
-            await savePhotoToGallery(photo);
-          }}
-        >
-          <Text style={styles.btnText}>💾 Save to Gallery</Text>
-        </Pressable>
-
-        <Pressable
-          style={[styles.btn, { marginHorizontal: 16, marginBottom: 8, backgroundColor: colors.primary }]}
+        <Pressable 
+          style={[styles.usePhotoButton, { backgroundColor: colors.primary }]} 
           onPress={() => {
             setPendingPhoto(photo);
             router.back();
           }}
         >
-          <Text style={styles.btnText}>✅ Use Photo</Text>
-        </Pressable>
-
-        <Pressable style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.gray }]}>← Back to Dashboard</Text>
+          <Text style={styles.usePhotoButtonText}>Use Photo</Text>
         </Pressable>
       </SafeAreaView>
     );
   }
 
-  // ── 4. Camera active ──────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.accent }]}>
-        <Text style={styles.headerTitle}>📷 Camera</Text>
-        <Text style={[styles.headerSub, { color: isDark ? "#C7D2FE" : "#DDD6FE" }]}>
-          Tap the button below to capture
-        </Text>
+    <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
+      <View style={styles.cameraHeader}>
+        <Pressable onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </Pressable>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Camera</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      {/* Camera view and loading spinner */}
       <View style={styles.cameraContainer}>
         <CameraView ref={cameraRef} style={styles.camera} facing="back" />
         {loading && (
           <View style={styles.loadingOverlay}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={[styles.loadingText, { color: colors.gray }]}>Capturing photo...</Text>
+            <Text style={[styles.loadingText, { color: colors.gray }]}>Capturing photo</Text>
           </View>
         )}
       </View>
 
-      {/* Capture button */}
-      <Pressable
-        style={({ pressed }) => [
-          styles.captureBtn,
-          pressed && { opacity: 0.8 },
-          { backgroundColor: colors.accent },
-        ]}
-        onPress={takePhoto}
-        disabled={loading}
-      >
-        <Text style={styles.captureBtnText}>📷 Capture Photo</Text>
-      </Pressable>
-
-      <Pressable style={styles.backBtn} onPress={() => router.back()}>
-        <Text style={[styles.backText, { color: colors.gray }]}>← Go Back</Text>
-      </Pressable>
+      <View style={styles.cameraFooter}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.captureButton,
+            pressed && { opacity: 0.9 },
+            { backgroundColor: colors.primary },
+          ]}
+          onPress={takePhoto}
+          disabled={loading}
+        >
+          <Ionicons name="camera" size={28} color="white" />
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // ── layout ──
-  container: {
+  screen: {
     flex: 1,
   },
-
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
+    paddingHorizontal: 24,
   },
-
-  // ── header ──
-  header: {
-    paddingTop: 16,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+  text: {
+    fontSize: 16,
+    marginTop: 12,
   },
-
-  headerTitle: {
+  title: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginTop: 16,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  primaryButton: {
+    marginTop: 24,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+    width: "100%",
+  },
+  buttonText: {
     color: "white",
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  secondaryButton: {
+    marginTop: 16,
+    paddingVertical: 10,
+  },
+  secondaryButtonText: {
+    fontSize: 15,
+    fontWeight: "500",
   },
 
-  headerSub: {
-    fontSize: 13,
-    marginTop: 2,
+  previewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  cameraHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
   },
 
-  // ── camera view ──
+  previewImage: {
+    flex: 1,
+    marginHorizontal: 16,
+    borderRadius: 16,
+  },
+
+  previewActions: {
+    flexDirection: "row",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 12,
+  },
+
+  actionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: "center",
+    gap: 6,
+  },
+
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+
+  usePhotoButton: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 24,
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: "center",
+  },
+
+  usePhotoButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
   cameraContainer: {
     flex: 1,
     marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 20,
+    marginTop: 8,
+    borderRadius: 16,
     overflow: "hidden",
     position: "relative",
   },
@@ -262,103 +328,30 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
   },
-
-  // ── loading ──
-  loadingBox: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-  },
-
   loadingText: {
     fontSize: 15,
-    marginTop: 8,
   },
 
-  // ── preview ──
-  preview: {
-    flex: 1,
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 20,
-  },
-
-  timeText: {
-    textAlign: "center",
-    fontSize: 14,
-    marginVertical: 10,
-  },
-
-  // ── row of two buttons ──
-  row: {
-    flexDirection: "row",
-    gap: 12,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-  },
-
-  // ── buttons ──
-  btn: {
-    flex: 1,
-    borderRadius: 14,
-    paddingVertical: 14,
+  cameraFooter: {
+    paddingVertical: 20,
+    paddingBottom: 32,
     alignItems: "center",
   },
-
-  btnText: {
-    color: "white",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
-  captureBtn: {
-    marginHorizontal: 16,
-    marginTop: 14,
-    borderRadius: 14,
-    paddingVertical: 16,
+  captureButton: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: "center",
-  },
-
-  captureBtnText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
-  backBtn: {
-    alignItems: "center",
-    paddingVertical: 12,
-    marginBottom: 4,
-  },
-
-  backText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-
-  // ── permission screen ──
-  permEmoji: {
-    fontSize: 56,
-    marginBottom: 12,
-  },
-
-  permTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-
-  permSub: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 24,
-    lineHeight: 20,
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
   },
 });
