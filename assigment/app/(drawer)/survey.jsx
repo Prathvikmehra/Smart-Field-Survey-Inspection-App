@@ -252,7 +252,7 @@ export default function CreateSurvey() {
         {pendingPhoto ? (
           <View style={styles.photoContainer}>
             <Image source={{ uri: pendingPhoto }} style={styles.previewImage} />
-            <Pressable style={styles.retakeBtn} onPress={() => router.push("/camera")}>
+            <Pressable style={styles.retakeBtn} onPress={() => router.push("/(drawer)/camera")}>
               <Ionicons name="camera-reverse" size={20} color="white" />
               <Text style={styles.retakeText}>Retake Photo</Text>
             </Pressable>
@@ -266,7 +266,7 @@ export default function CreateSurvey() {
                 borderColor: colors.primary + "40",
               },
             ]}
-            onPress={() => router.push("/camera")}
+            onPress={() => router.push("/(drawer)/camera")}
           >
             <Ionicons name="camera" size={24} color={colors.primary} />
             <Text style={[styles.cameraText, { color: colors.primary }]}>

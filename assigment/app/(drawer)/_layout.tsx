@@ -8,9 +8,11 @@ import { useTheme } from "@/context/ThemeContext";
 
 // All drawer menu items
 const MENU_ITEMS = [
-  { label: "Dashboard",  icon: "home-outline",      route: "/(drawer)/(tabs)/"       },
-  { label: "Survey",     icon: "clipboard-outline",  route: "/(drawer)/(tabs)/survey" },
-  { label: "Camera",     icon: "camera-outline",     route: "/camera"                 },
+  { label: "Dashboard",  icon: "home-outline",      route: "/(drawer)"       },
+  { label: "Survey",     icon: "clipboard-outline",  route: "/(drawer)/survey" },
+  { label: "Camera",     icon: "camera-outline",     route: "/(drawer)/camera" },
+  { label: "History",    icon: "time-outline",       route: "/(drawer)/history" },
+  { label: "Profile",    icon: "person-outline",     route: "/(drawer)/profile" },
   { label: "Contacts",   icon: "people-outline",     route: "/(drawer)/contacts"      },
   { label: "Location",   icon: "location-outline",   route: "/(drawer)/location"      },
   { label: "Clipboard",  icon: "copy-outline",       route: "/(drawer)/clipboard"     },
@@ -89,7 +91,7 @@ export default function DrawerLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
-        initialRouteName="(tabs)"
+        initialRouteName="index"
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={{
           headerShown: false,
@@ -98,7 +100,11 @@ export default function DrawerLayout() {
           swipeEdgeWidth:   60,
         }}
       >
-        <Drawer.Screen name="(tabs)"    options={{ drawerLabel: "Dashboard" }} />
+        <Drawer.Screen name="index"     options={{ drawerLabel: "Dashboard" }} />
+        <Drawer.Screen name="survey"    options={{ drawerLabel: "Survey"    }} />
+        <Drawer.Screen name="camera"    options={{ drawerLabel: "Camera"    }} />
+        <Drawer.Screen name="history"   options={{ drawerLabel: "History"   }} />
+        <Drawer.Screen name="profile"   options={{ drawerLabel: "Profile"   }} />
         <Drawer.Screen name="contacts"  options={{ drawerLabel: "Contacts"  }} />
         <Drawer.Screen name="location"  options={{ drawerLabel: "Location"  }} />
         <Drawer.Screen name="clipboard" options={{ drawerLabel: "Clipboard" }} />

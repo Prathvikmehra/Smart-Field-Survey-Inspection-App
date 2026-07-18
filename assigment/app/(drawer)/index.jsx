@@ -45,13 +45,13 @@ export default function Dashboard() {
             title="New Survey"
             icon="clipboard-outline"
             color={colors.primary}
-            onPress={() => router.push("/(drawer)/(tabs)/survey")}
+            onPress={() => router.push("/(drawer)/survey")}
           />
           <QuickActionCard
             title="Camera"
             icon="camera-outline"
             color={colors.accent}
-            onPress={() => router.push("/(drawer)/(tabs)/camera")}
+            onPress={() => router.push("/(drawer)/camera")}
           />
           <QuickActionCard
             title="Location"
@@ -63,7 +63,7 @@ export default function Dashboard() {
             title="History"
             icon="time-outline"
             color={colors.warning}
-            onPress={() => router.push("/(drawer)/(tabs)/history")}
+            onPress={() => router.push("/(drawer)/history")}
           />
         </View>
 
