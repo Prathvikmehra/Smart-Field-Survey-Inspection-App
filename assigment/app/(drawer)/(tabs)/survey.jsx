@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View, Text, TextInput, ScrollView,
-  StyleSheet, Pressable, Alert,
+  StyleSheet, Pressable, Alert, Image
 } from "react-native";
+import { useRouter } from "expo-router";
+import * as Clipboard from "expo-clipboard";
+import { Ionicons } from "@expo/vector-icons";
 import AppHeader from "@/components/AppHeader";
 import Colors from "@/constants/Colors";
+import { useSurveys } from "@/context/SurveyContext";
 
 const PRIORITIES = ["High", "Medium", "Low"];
 
@@ -15,15 +19,34 @@ const priorityColor = {
 };
 
 export default function CreateSurvey() {
+  const router = useRouter();
+  const { addSurvey, pendingPhoto, setPendingPhoto } = useSurveys();
+
   const [siteName,    setSiteName]    = useState("");
   const [clientName,  setClientName]  = useState("");
   const [description, setDescription] = useState("");
   const [priority,    setPriority]    = useState("Medium");
+  const [location,    setLocation]    = useState("");
 
   const today = new Date().toDateString();
 
   function resetForm() {
-    setSiteName(""); setClientName(""); setDescription(""); setPriority("Medium");
+    setSiteName(""); 
+    setClientName(""); 
+    setDescription(""); 
+    setPriority("Medium");
+    setLocation("");
+    setPendingPhoto(null);
+  }
+
+  async function pasteLocation() {
+    const hasText = await Clipboard.hasStringAsync();
+    if (hasText) {
+      const text = await Clipboard.getStringAsync();
+      setLocation(text);
+    } else {
+      Alert.alert("Empty", "Clipboard is empty.");
+    }
   }
 
   function handleSubmit() {
@@ -33,11 +56,34 @@ export default function CreateSurvey() {
     if (!clientName.trim()) {
       Alert.alert("Missing Field", "Please enter the Client Name."); return;
     }
+    
     const surveyId = "SRV-" + Date.now().toString().slice(-6);
+    
+    const newSurvey = {
+      id: surveyId,
+      site: siteName,
+      client: clientName,
+      description,
+      priority,
+      date: today,
+      status: "In Progress",
+      location: location || null,
+      photo: pendingPhoto || null,
+    };
+
+    addSurvey(newSurvey);
+
     Alert.alert(
       "✅ Survey Created!",
-      `Survey ID : ${surveyId}\nSite       : ${siteName}\nClient     : ${clientName}\nPriority   : ${priority}\nDate       : ${today}`,
-      [{ text: "OK", onPress: resetForm }]
+      `Survey ID: ${surveyId} has been added.`,
+      [
+        { text: "View Details", onPress: () => {
+            resetForm();
+            router.push(`/preview?id=${surveyId}`);
+          }
+        },
+        { text: "OK", onPress: resetForm }
+      ]
     );
   }
 
@@ -72,6 +118,36 @@ export default function CreateSurvey() {
           })}
         </View>
 
+        <Text style={styles.label}>Location Coordinates</Text>
+        <View style={styles.row}>
+          <TextInput 
+            style={[styles.input, { flex: 1, marginRight: 10 }]} 
+            placeholder="Paste or type location..." 
+            placeholderTextColor={Colors.gray} 
+            value={location} 
+            onChangeText={setLocation} 
+          />
+          <Pressable style={styles.pasteBtn} onPress={pasteLocation}>
+            <Ionicons name="clipboard-outline" size={20} color="white" />
+          </Pressable>
+        </View>
+
+        <Text style={styles.label}>Site Photo</Text>
+        {pendingPhoto ? (
+          <View style={styles.photoContainer}>
+            <Image source={{ uri: pendingPhoto }} style={styles.previewImage} />
+            <Pressable style={styles.retakeBtn} onPress={() => router.push("/camera")}>
+              <Ionicons name="camera-reverse" size={20} color="white" />
+              <Text style={styles.retakeText}>Retake Photo</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable style={styles.cameraBtn} onPress={() => router.push("/camera")}>
+            <Ionicons name="camera" size={24} color={Colors.primary} />
+            <Text style={styles.cameraText}>Capture Site Photo</Text>
+          </Pressable>
+        )}
+
         <Text style={styles.label}>Date</Text>
         <View style={styles.dateBox}><Text style={styles.dateText}>📅  {today}</Text></View>
 
@@ -98,6 +174,14 @@ const styles = StyleSheet.create({
   priorityBtn: { flex: 1, borderWidth: 2, borderColor: Colors.border, borderRadius: 12, paddingVertical: 10, alignItems: "center", backgroundColor: Colors.card },
   priorityText: { fontSize: 14, fontWeight: "600", color: Colors.gray },
   priorityTextActive: { color: "white" },
+  row: { flexDirection: "row", alignItems: "center" },
+  pasteBtn: { backgroundColor: Colors.accent, padding: 12, borderRadius: 12, justifyContent: "center", alignItems: "center" },
+  cameraBtn: { backgroundColor: Colors.primary + "15", borderWidth: 1, borderColor: Colors.primary + "40", borderRadius: 12, padding: 20, alignItems: "center", justifyContent: "center", borderStyle: "dashed" },
+  cameraText: { color: Colors.primary, fontWeight: "600", marginTop: 8 },
+  photoContainer: { borderRadius: 12, overflow: "hidden", position: "relative" },
+  previewImage: { width: "100%", height: 200, resizeMode: "cover" },
+  retakeBtn: { position: "absolute", bottom: 10, right: 10, backgroundColor: "rgba(0,0,0,0.6)", flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, gap: 6 },
+  retakeText: { color: "white", fontSize: 12, fontWeight: "bold" },
   dateBox: { backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12 },
   dateText: { fontSize: 15, color: Colors.text },
   submitBtn: { backgroundColor: Colors.primary, borderRadius: 14, paddingVertical: 16, alignItems: "center", marginTop: 28 },

@@ -12,9 +12,11 @@ import {
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
 import Colors from "../constants/Colors";
+import { useSurveys } from "../context/SurveyContext";
 
 export default function CameraScreen() {
   const router = useRouter();
+  const { setPendingPhoto } = useSurveys();
 
   // expo-camera permission hook
   const [permission, requestPermission] = useCameraPermissions();
@@ -125,6 +127,16 @@ export default function CameraScreen() {
             <Text style={styles.btnText}>🗑️ Delete</Text>
           </Pressable>
         </View>
+
+        <Pressable 
+          style={[styles.btn, { marginHorizontal: 16, marginBottom: 12, backgroundColor: Colors.success }]} 
+          onPress={() => {
+            setPendingPhoto(photo);
+            router.back();
+          }}
+        >
+          <Text style={styles.btnText}>✅ Use Photo</Text>
+        </Pressable>
 
         <Pressable style={styles.backBtn} onPress={() => router.back()}>
           <Text style={styles.backText}>← Back to Dashboard</Text>
