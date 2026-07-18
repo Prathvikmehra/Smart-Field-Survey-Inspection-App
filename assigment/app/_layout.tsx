@@ -9,6 +9,7 @@ export const unstable_settings = {
 
 import { SurveyProvider } from "@/context/SurveyContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { ProfileProvider } from "@/context/ProfileContext";
 
 function ThemedStatusBar() {
   const { isDark } = useTheme();
@@ -19,12 +20,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <SurveyProvider>
-        <Stack>
-          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-          <Stack.Screen name="camera" options={{ headerShown: false }} />
-          <Stack.Screen name="preview" options={{ headerShown: false, presentation: "modal" }} />
-        </Stack>
-        <ThemedStatusBar />
+        <ProfileProvider>
+          <Stack>
+            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+            <Stack.Screen name="preview" options={{ headerShown: false, presentation: "modal" }} />
+          </Stack>
+          <ThemedStatusBar />
+        </ProfileProvider>
       </SurveyProvider>
     </ThemeProvider>
   );

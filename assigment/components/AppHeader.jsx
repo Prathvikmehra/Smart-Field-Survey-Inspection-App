@@ -1,14 +1,20 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
 import { useNavigation } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
+import { useProfile } from "@/context/ProfileContext";
 
 // Custom app header shown at the top of each main screen.
 // The hamburger button (☰) opens the drawer from anywhere in the app.
 export default function AppHeader({ title = "Smart Survey", subtitle = "Field Survey & Inspection" }) {
   const navigation = useNavigation();
   const { colors, toggleTheme, isDark } = useTheme();
+  const { profile, loading } = useProfile();
+
+  const getInitials = (name) => {
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   function openDrawer() {
     // Dispatch bubbles up through tabs → drawer, so this works from any nested screen
@@ -28,13 +34,21 @@ export default function AppHeader({ title = "Smart Survey", subtitle = "Field Su
         <Text style={[styles.subtitle, { color: isDark ? "#C7D2FE" : "#BFDBFE" }]}>{subtitle}</Text>
       </View>
 
-      {/* Right — theme toggle + user initials avatar */}
+      {/* Right — theme toggle + user avatar */}
       <View style={styles.rightActions}>
         <Pressable style={styles.themeBtn} onPress={toggleTheme}>
           <Ionicons name={isDark ? "sunny" : "moon"} size={20} color="white" />
         </Pressable>
-        <View style={styles.avatar}>
-          <Text style={[styles.avatarText, { color: colors.primary }]}>PM</Text>
+        <View style={styles.avatarContainer}>
+          {profile.photo ? (
+            <Image source={{ uri: profile.photo }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={[styles.avatarText, { color: colors.primary }]}>
+                {!loading ? getInitials(profile.name) : ".."}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -82,6 +96,11 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 
+  avatarContainer: {
+    width: 40,
+    height: 40,
+  },
+
   avatar: {
     backgroundColor: "white",
     width: 40,
@@ -89,6 +108,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  avatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 
   avatarText: {

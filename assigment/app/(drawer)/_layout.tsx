@@ -1,33 +1,39 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { useRouter, usePathname } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
+import { useProfile } from "@/context/ProfileContext";
 
 // All drawer menu items
 const MENU_ITEMS = [
-  { label: "Dashboard",  icon: "home-outline",      route: "/(drawer)"       },
+  { label: "Dashboard",  icon: "home-outline",      route: "/(drawer)" },
   { label: "Survey",     icon: "clipboard-outline",  route: "/(drawer)/survey" },
   { label: "Camera",     icon: "camera-outline",     route: "/(drawer)/camera" },
   { label: "History",    icon: "time-outline",       route: "/(drawer)/history" },
   { label: "Profile",    icon: "person-outline",     route: "/(drawer)/profile" },
-  { label: "Contacts",   icon: "people-outline",     route: "/(drawer)/contacts"      },
-  { label: "Location",   icon: "location-outline",   route: "/(drawer)/location"      },
-  { label: "Clipboard",  icon: "copy-outline",       route: "/(drawer)/clipboard"     },
-  { label: "Settings",   icon: "settings-outline",   route: "/(drawer)/settings"      },
+  { label: "Contacts",   icon: "people-outline",     route: "/(drawer)/contacts" },
+  { label: "Location",   icon: "location-outline",   route: "/(drawer)/location" },
+  { label: "Clipboard",  icon: "copy-outline",       route: "/(drawer)/clipboard" },
+  { label: "Settings",   icon: "settings-outline",   route: "/(drawer)/settings" },
 ];
 
 function CustomDrawerContent(props) {
   const router   = useRouter();
   const pathname = usePathname();
   const { colors } = useTheme();
+  const { profile, loading } = useProfile();
 
   function navigate(route) {
     props.navigation.closeDrawer();
     router.push(route);
   }
+
+  const getInitials = (name) => {
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   return (
     <DrawerContentScrollView {...props} contentContainerStyle={[
@@ -35,13 +41,23 @@ function CustomDrawerContent(props) {
       { backgroundColor: colors.background }
     ]}>
 
-      {/* Blue profile header */}
+      {/* Profile header */}
       <View style={[styles.profileBox, { backgroundColor: colors.primary }]}>
-        <View style={styles.avatar}>
-          <Text style={[styles.avatarText, { color: colors.primary }]}>PM</Text>
-        </View>
-        <Text style={styles.profileName}>Prathvik Mehra</Text>
-        <Text style={[styles.profileSub, { color: colors.primary === "#2563EB" ? "#BFDBFE" : "#2d3748" }]}>Enrollment: 23CS001</Text>
+        {loading ? (
+          <ActivityIndicator size="large" color="white" />
+        ) : profile.photo ? (
+          <Image source={{ uri: profile.photo }} style={styles.avatarImage} />
+        ) : (
+          <View style={styles.avatar}>
+            <Text style={[styles.avatarText, { color: colors.primary }]}>
+              {getInitials(profile.name)}
+            </Text>
+          </View>
+        )}
+        <Text style={styles.profileName}>{profile.name}</Text>
+        <Text style={[styles.profileSub, { color: colors.primary === "#2563EB" ? "#BFDBFE" : "#2d3748" }]}>
+          Enrollment: {profile.enrollment}
+        </Text>
       </View>
 
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -127,6 +143,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: 10,
+  },
+  avatarImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     marginBottom: 10,
   },
   avatarText:   { fontSize: 24, fontWeight: "bold" },
