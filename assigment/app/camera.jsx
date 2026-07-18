@@ -22,7 +22,7 @@ export default function CameraScreen() {
 
   // expo-camera permission hook
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions();
+  const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions({ permissions: ['photo'] });
 
   // UI states
   const [loading, setLoading] = useState(false); // capturing in progress
