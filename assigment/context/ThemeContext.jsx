@@ -2,6 +2,28 @@ import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "react-native";
 
+// Fallback in-memory storage if AsyncStorage native module isn't available
+const memoryStorage = new Map();
+
+const safeAsyncStorage = {
+  async getItem(key) {
+    try {
+      return await AsyncStorage.getItem(key);
+    } catch (e) {
+      console.warn("AsyncStorage unavailable, using memory fallback:", e);
+      return memoryStorage.get(key) || null;
+    }
+  },
+  async setItem(key, value) {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("AsyncStorage unavailable, using memory fallback:", e);
+      memoryStorage.set(key, value);
+    }
+  }
+};
+
 const lightColors = {
   primary: "#2563EB",
   secondary: "#38BDF8",
@@ -39,7 +61,7 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     const loadTheme = async () => {
       try {
-        const savedTheme = await AsyncStorage.getItem("theme");
+        const savedTheme = await safeAsyncStorage.getItem("theme");
         if (savedTheme) {
           setTheme(savedTheme);
         }
@@ -54,7 +76,7 @@ export function ThemeProvider({ children }) {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     try {
-      await AsyncStorage.setItem("theme", newTheme);
+      await safeAsyncStorage.setItem("theme", newTheme);
     } catch (e) {
       console.error("Failed to save theme:", e);
     }

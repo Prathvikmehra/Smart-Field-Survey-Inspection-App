@@ -1,6 +1,28 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Fallback in-memory storage if AsyncStorage native module isn't available
+const memoryStorage = new Map();
+
+const safeAsyncStorage = {
+  async getItem(key) {
+    try {
+      return await AsyncStorage.getItem(key);
+    } catch (e) {
+      console.warn("AsyncStorage unavailable, using memory fallback:", e);
+      return memoryStorage.get(key) || null;
+    }
+  },
+  async setItem(key, value) {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("AsyncStorage unavailable, using memory fallback:", e);
+      memoryStorage.set(key, value);
+    }
+  }
+};
+
 // ── Types (as JSDoc for simplicity) ──────────────────────────────────────────
 // Survey: { id, site, client, description, priority, date, status, notes, photo, location }
 
@@ -36,7 +58,7 @@ export function SurveyProvider({ children }) {
   useEffect(() => {
     const loadSurveys = async () => {
       try {
-        const stored = await AsyncStorage.getItem("surveys");
+        const stored = await safeAsyncStorage.getItem("surveys");
         if (stored) {
           setSurveys(JSON.parse(stored));
         }
@@ -53,7 +75,7 @@ export function SurveyProvider({ children }) {
   useEffect(() => {
     const saveSurveys = async () => {
       try {
-        await AsyncStorage.setItem("surveys", JSON.stringify(surveys));
+        await safeAsyncStorage.setItem("surveys", JSON.stringify(surveys));
       } catch (e) {
         console.error("Failed to save surveys:", e);
       }
