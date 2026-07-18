@@ -7,7 +7,7 @@ import { useSurveys } from "@/context/SurveyContext";
 export default function PreviewSurvey() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { getSurvey, deleteSurvey } = useSurveys();
+  const { getSurvey, deleteSurvey, setPendingPhoto } = useSurveys();
   
   const survey = getSurvey(id);
 
@@ -20,6 +20,17 @@ export default function PreviewSurvey() {
         </Pressable>
       </View>
     );
+  }
+
+  function handleEdit() {
+    // Set pending photo if exists
+    if (survey.photo) {
+      setPendingPhoto(survey.photo);
+    }
+    router.push({
+      pathname: "/(drawer)/(tabs)/survey",
+      params: { editId: survey.id }
+    });
   }
 
   function handleDelete() {
@@ -93,6 +104,17 @@ export default function PreviewSurvey() {
         )}
 
       </ScrollView>
+
+      <View style={styles.footer}>
+        <Pressable style={[styles.footerBtn, styles.editBtn]} onPress={handleEdit}>
+          <Ionicons name="create-outline" size={20} color="white" />
+          <Text style={styles.footerBtnText}>Edit Survey</Text>
+        </Pressable>
+        <Pressable style={[styles.footerBtn, styles.submitBtn]}>
+          <Ionicons name="checkmark-circle-outline" size={20} color="white" />
+          <Text style={styles.footerBtnText}>Submit</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -116,5 +138,10 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   errorText: { fontSize: 18, color: Colors.danger, fontWeight: "bold", marginBottom: 20 },
   btn: { backgroundColor: Colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  btnText: { color: "white", fontWeight: "bold", fontSize: 16 }
+  btnText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  footer: { flexDirection: "row", padding: 16, gap: 12, backgroundColor: Colors.card, borderTopWidth: 1, borderTopColor: Colors.border },
+  footerBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 14, borderRadius: 12 },
+  editBtn: { backgroundColor: Colors.accent },
+  submitBtn: { backgroundColor: Colors.success },
+  footerBtnText: { color: "white", fontWeight: "bold", fontSize: 15 }
 });

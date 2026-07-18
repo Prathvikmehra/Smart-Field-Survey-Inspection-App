@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useRouter } from "expo-router";
-import Colors from "../constants/Colors";
-import { useSurveys } from "../context/SurveyContext";
+import Colors from "@/constants/Colors";
+import { useSurveys } from "@/context/SurveyContext";
 
 export default function CameraScreen() {
   const router = useRouter();

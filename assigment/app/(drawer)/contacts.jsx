@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, TextInput, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Pressable, TextInput, Alert, RefreshControl } from "react-native";
 import * as Contacts from "expo-contacts";
 import * as Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,6 +11,7 @@ export default function ContactsScreen() {
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
@@ -43,8 +44,14 @@ export default function ContactsScreen() {
       setErrorMsg("Failed to fetch contacts.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchContacts();
+  };
 
   function handleSearch(text) {
     setSearch(text);
@@ -123,6 +130,9 @@ export default function ContactsScreen() {
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[Colors.primary]} />
+          }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
               <Ionicons name="search-outline" size={48} color={Colors.border} />

@@ -20,7 +20,8 @@ const priorityColor = {
 
 export default function CreateSurvey() {
   const router = useRouter();
-  const { addSurvey, pendingPhoto, setPendingPhoto } = useSurveys();
+  const { addSurvey, editSurvey, pendingPhoto, setPendingPhoto, getSurvey } = useSurveys();
+  const { editId } = useLocalSearchParams(); // Get editId from params if editing
 
   const [siteName,    setSiteName]    = useState("");
   const [clientName,  setClientName]  = useState("");
@@ -29,6 +30,23 @@ export default function CreateSurvey() {
   const [location,    setLocation]    = useState("");
 
   const today = new Date().toDateString();
+
+  // If editing, load existing data
+  useEffect(() => {
+    if (editId) {
+      const existing = getSurvey(editId);
+      if (existing) {
+        setSiteName(existing.site);
+        setClientName(existing.client);
+        setDescription(existing.description || "");
+        setPriority(existing.priority);
+        setLocation(existing.location || "");
+        if (existing.photo) {
+          setPendingPhoto(existing.photo);
+        }
+      }
+    }
+  }, [editId, getSurvey, setPendingPhoto]);
 
   function resetForm() {
     setSiteName(""); 
@@ -57,39 +75,68 @@ export default function CreateSurvey() {
       Alert.alert("Missing Field", "Please enter the Client Name."); return;
     }
     
-    const surveyId = "SRV-" + Date.now().toString().slice(-6);
-    
-    const newSurvey = {
-      id: surveyId,
-      site: siteName,
-      client: clientName,
-      description,
-      priority,
-      date: today,
-      status: "In Progress",
-      location: location || null,
-      photo: pendingPhoto || null,
-    };
+    if (editId) {
+      // Editing existing survey
+      const updatedSurvey = {
+        ...getSurvey(editId),
+        site: siteName,
+        client: clientName,
+        description,
+        priority,
+        location: location || null,
+        photo: pendingPhoto || null,
+      };
+      editSurvey(updatedSurvey);
+      Alert.alert(
+        "✅ Survey Updated!",
+        `Survey ID: ${editId} has been updated.`,
+        [
+          { text: "View Details", onPress: () => {
+              resetForm();
+              router.push(`/preview?id=${editId}`);
+            }
+          },
+          { text: "OK", onPress: resetForm }
+        ]
+      );
+    } else {
+      // Creating new survey
+      const surveyId = "SRV-" + Date.now().toString().slice(-6);
+      
+      const newSurvey = {
+        id: surveyId,
+        site: siteName,
+        client: clientName,
+        description,
+        priority,
+        date: today,
+        status: "In Progress",
+        location: location || null,
+        photo: pendingPhoto || null,
+      };
 
-    addSurvey(newSurvey);
+      addSurvey(newSurvey);
 
-    Alert.alert(
-      "✅ Survey Created!",
-      `Survey ID: ${surveyId} has been added.`,
-      [
-        { text: "View Details", onPress: () => {
-            resetForm();
-            router.push(`/preview?id=${surveyId}`);
-          }
-        },
-        { text: "OK", onPress: resetForm }
-      ]
-    );
+      Alert.alert(
+        "✅ Survey Created!",
+        `Survey ID: ${surveyId} has been added.`,
+        [
+          { text: "View Details", onPress: () => {
+              resetForm();
+              router.push(`/preview?id=${surveyId}`);
+            }
+          },
+          { text: "OK", onPress: resetForm }
+        ]
+      );
+    }
   }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-      <AppHeader title="Create Survey" subtitle="Fill in all required fields" />
+      <AppHeader 
+        title={editId ? "Edit Survey" : "Create Survey"} 
+        subtitle={editId ? "Update survey details" : "Fill in all required fields"} />
 
       <View style={styles.form}>
 
@@ -152,10 +199,13 @@ export default function CreateSurvey() {
         <View style={styles.dateBox}><Text style={styles.dateText}>📅  {today}</Text></View>
 
         <Pressable style={({ pressed }) => [styles.submitBtn, pressed && { opacity: 0.8 }]} onPress={handleSubmit}>
-          <Text style={styles.submitText}>Submit Survey</Text>
+          <Text style={styles.submitText}>{editId ? "Update Survey" : "Submit Survey"}</Text>
         </Pressable>
-        <Pressable style={styles.resetBtn} onPress={resetForm}>
-          <Text style={styles.resetText}>Reset Form</Text>
+        <Pressable style={styles.resetBtn} onPress={() => {
+          resetForm();
+          router.back();
+        }}>
+          <Text style={styles.resetText}>{editId ? "Cancel" : "Reset Form"}</Text>
         </Pressable>
 
       </View>

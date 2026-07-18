@@ -36,6 +36,11 @@ export function SurveyProvider({ children }) {
     setSurveys(prev => [survey, ...prev]);
   }
 
+  // Edit an existing survey
+  function editSurvey(updatedSurvey) {
+    setSurveys(prev => prev.map(s => s.id === updatedSurvey.id ? updatedSurvey : s));
+  }
+
   // Remove a survey by id
   function deleteSurvey(id) {
     setSurveys(prev => prev.filter(s => s.id !== id));
@@ -47,7 +52,7 @@ export function SurveyProvider({ children }) {
   }
 
   return (
-    <SurveyContext.Provider value={{ surveys, addSurvey, deleteSurvey, getSurvey, pendingPhoto, setPendingPhoto }}>
+    <SurveyContext.Provider value={{ surveys, addSurvey, deleteSurvey, editSurvey, getSurvey, pendingPhoto, setPendingPhoto }}>
       {children}
     </SurveyContext.Provider>
   );
