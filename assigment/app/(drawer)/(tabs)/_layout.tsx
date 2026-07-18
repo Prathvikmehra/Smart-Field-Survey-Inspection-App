@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "../../constants/Colors";
+import Colors from "@/constants/Colors";
 
 // Bottom Tab Navigator — 4 tabs: Dashboard, New Survey, History, Profile
 export default function TabLayout() {

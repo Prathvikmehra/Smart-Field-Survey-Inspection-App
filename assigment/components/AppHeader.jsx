@@ -1,18 +1,33 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "../constants/Colors";
+import { DrawerActions } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
+import Colors from "@/constants/Colors";
 
-// Custom app header shown at the top of the Dashboard
-export default function AppHeader() {
+// Custom app header shown at the top of each main screen.
+// The hamburger button (☰) opens the drawer from anywhere in the app.
+export default function AppHeader({ title = "Smart Survey", subtitle = "Field Survey & Inspection" }) {
+  const navigation = useNavigation();
+
+  function openDrawer() {
+    // Dispatch bubbles up through tabs → drawer, so this works from any nested screen
+    navigation.dispatch(DrawerActions.openDrawer());
+  }
+
   return (
     <View style={styles.container}>
-      {/* Left side — app title */}
-      <View>
-        <Text style={styles.title}>📋 Smart Survey</Text>
-        <Text style={styles.subtitle}>Field Survey & Inspection</Text>
+      {/* Left — hamburger menu button */}
+      <Pressable style={styles.menuBtn} onPress={openDrawer}>
+        <Ionicons name="menu" size={28} color="white" />
+      </Pressable>
+
+      {/* Centre — title + subtitle */}
+      <View style={styles.titleBox}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
-      {/* Right side — user initials avatar */}
+      {/* Right — user initials avatar */}
       <View style={styles.avatar}>
         <Text style={styles.avatarText}>PM</Text>
       </View>
@@ -23,40 +38,49 @@ export default function AppHeader() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    paddingTop: 50,                 // leave room for status bar
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    paddingTop: 50,                   // space for status bar
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
 
+  menuBtn: {
+    padding: 4,
+    marginRight: 10,
+  },
+
+  titleBox: {
+    flex: 1,
+  },
+
   title: {
     color: "white",
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
   },
 
   subtitle: {
-    color: "#BFDBFE",               // light blue-white
-    fontSize: 13,
-    marginTop: 2,
+    color: "#BFDBFE",
+    fontSize: 12,
+    marginTop: 1,
   },
 
   avatar: {
     backgroundColor: "white",
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: 10,
   },
 
   avatarText: {
     color: Colors.primary,
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 15,
   },
 });

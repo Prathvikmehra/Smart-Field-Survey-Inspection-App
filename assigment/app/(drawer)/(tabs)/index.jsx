@@ -1,39 +1,18 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import AppHeader from "../../components/AppHeader";
-import QuickActionCard from "../../components/QuickActionCard";
-import SurveySummaryCard from "../../components/SurveySummaryCard";
-import Colors from "../../constants/Colors";
+import AppHeader from "@/components/AppHeader";
+import QuickActionCard from "@/components/QuickActionCard";
+import SurveySummaryCard from "@/components/SurveySummaryCard";
+import Colors from "@/constants/Colors";
 
 // Sample recent survey data for the dashboard summary
 const recentSurveys = [
-  {
-    id: "1",
-    site: "ABC Industries",
-    client: "John Smith",
-    priority: "High",
-    date: "18 Jul 2026",
-    status: "Completed",
-  },
-  {
-    id: "2",
-    site: "XYZ Factory",
-    client: "Sarah Lee",
-    priority: "Medium",
-    date: "17 Jul 2026",
-    status: "In Progress",
-  },
-  {
-    id: "3",
-    site: "Metro Plaza",
-    client: "Raj Kumar",
-    priority: "Low",
-    date: "16 Jul 2026",
-    status: "Pending",
-  },
+  { id: "1", site: "ABC Industries",  client: "John Smith", priority: "High",   date: "18 Jul 2026", status: "Completed"   },
+  { id: "2", site: "XYZ Factory",     client: "Sarah Lee",  priority: "Medium", date: "17 Jul 2026", status: "In Progress" },
+  { id: "3", site: "Metro Plaza",     client: "Raj Kumar",  priority: "Low",    date: "16 Jul 2026", status: "Pending"     },
 ];
 
-// Returns a greeting based on the current hour
+// Returns a greeting based on current hour
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 12) return "Good Morning";
@@ -45,11 +24,9 @@ export default function Dashboard() {
   const router = useRouter();
 
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Top blue header */}
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+
+      {/* Header — hamburger opens the drawer */}
       <AppHeader />
 
       <View style={styles.content}>
@@ -59,7 +36,7 @@ export default function Dashboard() {
         <Text style={styles.name}>Prathvik Mehra</Text>
         <Text style={styles.enrollment}>Enrollment No: 23CS001</Text>
 
-        {/* Today's Survey Count Card */}
+        {/* Today's Survey Count */}
         <View style={styles.countCard}>
           <Text style={styles.countLabel}>Today's Surveys</Text>
           <Text style={styles.countNumber}>12</Text>
@@ -73,7 +50,7 @@ export default function Dashboard() {
             title="New Survey"
             icon="clipboard-outline"
             color={Colors.primary}
-            onPress={() => router.push("/(tabs)/survey")}
+            onPress={() => router.push("/(drawer)/(tabs)/survey")}
           />
           <QuickActionCard
             title="Camera"
@@ -85,13 +62,13 @@ export default function Dashboard() {
             title="Location"
             icon="location-outline"
             color={Colors.success}
-            onPress={() => {}}   // Module 4 — Location (coming later)
+            onPress={() => router.push("/(drawer)/location")}
           />
           <QuickActionCard
             title="History"
             icon="time-outline"
             color={Colors.warning}
-            onPress={() => router.push("/(tabs)/history")}
+            onPress={() => router.push("/(drawer)/(tabs)/history")}
           />
         </View>
 
@@ -111,34 +88,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-
   content: {
     padding: 20,
     paddingBottom: 40,
   },
-
   greeting: {
     fontSize: 26,
     fontWeight: "bold",
     color: Colors.text,
     marginTop: 4,
   },
-
   name: {
     fontSize: 18,
     fontWeight: "600",
     color: Colors.text,
     marginTop: 4,
   },
-
   enrollment: {
     fontSize: 14,
     color: Colors.gray,
     marginTop: 2,
     marginBottom: 4,
   },
-
-  // Blue count card
   countCard: {
     backgroundColor: Colors.primary,
     borderRadius: 20,
@@ -146,25 +117,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 4,
   },
-
   countLabel: {
     color: "#BFDBFE",
     fontSize: 15,
   },
-
   countNumber: {
     color: "white",
     fontSize: 48,
     fontWeight: "bold",
     lineHeight: 56,
   },
-
   countSub: {
     color: "#BFDBFE",
     fontSize: 13,
     marginTop: 2,
   },
-
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -172,8 +139,6 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 14,
   },
-
-  // 2-column grid for Quick Action cards
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
