@@ -28,7 +28,7 @@ export default function PreviewSurvey() {
       setPendingPhoto(survey.photo);
     }
     router.push({
-      pathname: "/(drawer)/(tabs)/survey",
+      pathname: "/(drawer)/survey",
       params: { editId: survey.id }
     });
   }
