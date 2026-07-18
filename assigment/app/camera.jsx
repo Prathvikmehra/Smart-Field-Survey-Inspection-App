@@ -187,15 +187,16 @@ export default function CameraScreen() {
         </Text>
       </View>
 
-      {/* Camera view or loading spinner */}
-      {loading ? (
-        <View style={styles.loadingBox}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={[styles.loadingText, { color: colors.gray }]}>Capturing photo...</Text>
-        </View>
-      ) : (
+      {/* Camera view and loading spinner */}
+      <View style={styles.cameraContainer}>
         <CameraView ref={cameraRef} style={styles.camera} facing="back" />
-      )}
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.gray }]}>Capturing photo...</Text>
+          </View>
+        )}
+      </View>
 
       {/* Capture button */}
       <Pressable
@@ -251,12 +252,23 @@ const styles = StyleSheet.create({
   },
 
   // ── camera view ──
-  camera: {
+  cameraContainer: {
     flex: 1,
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 20,
     overflow: "hidden",
+    position: "relative",
+  },
+  camera: {
+    flex: 1,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
   },
 
   // ── loading ──
