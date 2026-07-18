@@ -3,17 +3,17 @@ import { View, Text, StyleSheet, FlatList, TextInput, Pressable, Alert } from "r
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AppHeader from "@/components/AppHeader";
-import Colors from "@/constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 import { useSurveys } from "@/context/SurveyContext";
 
 export default function HistoryScreen() {
   const router = useRouter();
   const { surveys, deleteSurvey } = useSurveys();
+  const { colors } = useTheme();
   
   const [search, setSearch] = useState("");
   const [filterPriority, setFilterPriority] = useState("All");
 
-  // Filter surveys based on search query and priority
   const filteredSurveys = surveys.filter(s => {
     const matchesSearch = s.site.toLowerCase().includes(search.toLowerCase()) || 
                           s.client.toLowerCase().includes(search.toLowerCase()) ||
@@ -34,25 +34,36 @@ export default function HistoryScreen() {
   }
 
   function renderItem({ item }) {
-    const priorityColor = item.priority === "High" ? Colors.danger : item.priority === "Medium" ? Colors.warning : Colors.success;
+    const priorityMap = {
+      High: colors.danger,
+      Medium: colors.warning,
+      Low: colors.success,
+    };
+    const priorityColor = priorityMap[item.priority] || colors.gray;
     
     return (
       <Pressable 
-        style={styles.card} 
+        style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]} 
         onPress={() => router.push(`/preview?id=${item.id}`)}
       >
         <View style={styles.cardHeader}>
-          <Text style={styles.idText}>{item.id}</Text>
+          <Text style={[styles.idText, { color: colors.primary, backgroundColor: colors.primary + "15" }]}>
+            {item.id}
+          </Text>
           <View style={[styles.priorityDot, { backgroundColor: priorityColor }]} />
         </View>
         
-        <Text style={styles.siteText} numberOfLines={1}>{item.site}</Text>
-        <Text style={styles.clientText} numberOfLines={1}>{item.client}</Text>
+        <Text style={[styles.siteText, { color: colors.text }]} numberOfLines={1}>
+          {item.site}
+        </Text>
+        <Text style={[styles.clientText, { color: colors.gray }]} numberOfLines={1}>
+          {item.client}
+        </Text>
         
-        <View style={styles.cardFooter}>
-          <Text style={styles.dateText}>{item.date}</Text>
+        <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
+          <Text style={[styles.dateText, { color: colors.gray }]}>{item.date}</Text>
           <Pressable style={styles.deleteBtn} onPress={() => confirmDelete(item.id, item.site)}>
-            <Ionicons name="trash-outline" size={20} color={Colors.danger} />
+            <Ionicons name="trash-outline" size={20} color={colors.danger} />
           </Pressable>
         </View>
       </Pressable>
@@ -60,22 +71,25 @@ export default function HistoryScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <AppHeader title="Survey History" subtitle="Manage your surveys" />
       
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={Colors.gray} style={styles.searchIcon} />
+      <View style={[
+        styles.searchContainer,
+        { backgroundColor: colors.card, borderColor: colors.border }
+      ]}>
+        <Ionicons name="search" size={20} color={colors.gray} style={styles.searchIcon} />
         <TextInput 
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: colors.text }]}
           placeholder="Search by ID, Site or Client..."
-          placeholderTextColor={Colors.gray}
+          placeholderTextColor={colors.gray}
           value={search}
           onChangeText={setSearch}
         />
         {search.length > 0 && (
           <Pressable onPress={() => setSearch("")} style={styles.clearBtn}>
-            <Ionicons name="close-circle" size={20} color={Colors.gray} />
+            <Ionicons name="close-circle" size={20} color={colors.gray} />
           </Pressable>
         )}
       </View>
@@ -85,10 +99,20 @@ export default function HistoryScreen() {
         {["All", "High", "Medium", "Low"].map(p => (
           <Pressable 
             key={p} 
-            style={[styles.filterBtn, filterPriority === p && styles.filterBtnActive]}
+            style={[
+              styles.filterBtn,
+              { backgroundColor: colors.card, borderColor: colors.border },
+              filterPriority === p && { backgroundColor: colors.primary, borderColor: colors.primary }
+            ]}
             onPress={() => setFilterPriority(p)}
           >
-            <Text style={[styles.filterText, filterPriority === p && styles.filterTextActive]}>{p}</Text>
+            <Text style={[
+              styles.filterText,
+              { color: colors.gray },
+              filterPriority === p && { color: "white" }
+            ]}>
+              {p}
+            </Text>
           </Pressable>
         ))}
       </View>
@@ -101,8 +125,8 @@ export default function HistoryScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="document-text-outline" size={48} color={Colors.border} />
-            <Text style={styles.emptyText}>No surveys found.</Text>
+            <Ionicons name="document-text-outline" size={48} color={colors.border} />
+            <Text style={[styles.emptyText, { color: colors.gray }]}>No surveys found.</Text>
           </View>
         }
       />
@@ -111,31 +135,29 @@ export default function HistoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: { flex: 1 },
   searchContainer: { 
     flexDirection: "row", alignItems: "center", 
-    backgroundColor: Colors.card, margin: 16, marginBottom: 8,
+    margin: 16, marginBottom: 8,
     borderRadius: 12, paddingHorizontal: 12, 
-    borderWidth: 1, borderColor: Colors.border 
+    borderWidth: 1
   },
   searchIcon: { marginRight: 8 },
-  searchInput: { flex: 1, height: 48, fontSize: 15, color: Colors.text },
+  searchInput: { flex: 1, height: 48, fontSize: 15 },
   clearBtn: { padding: 4 },
   filterContainer: { flexDirection: "row", paddingHorizontal: 16, marginBottom: 12, gap: 8 },
-  filterBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: Colors.card, borderWidth: 1, borderColor: Colors.border },
-  filterBtnActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  filterText: { fontSize: 13, fontWeight: "600", color: Colors.gray },
-  filterTextActive: { color: "white" },
+  filterBtn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1 },
+  filterText: { fontSize: 13, fontWeight: "600" },
   listContent: { paddingHorizontal: 16, paddingBottom: 40 },
-  card: { backgroundColor: Colors.card, padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, borderColor: Colors.border, shadowColor: "#000", shadowOpacity: 0.03, shadowRadius: 5, elevation: 1 },
+  card: { padding: 16, borderRadius: 16, marginBottom: 12, borderWidth: 1, shadowColor: "#000", shadowOpacity: 0.03, shadowRadius: 5, elevation: 1 },
   cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  idText: { fontSize: 13, fontWeight: "bold", color: Colors.primary, backgroundColor: Colors.primary + "15", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  idText: { fontSize: 13, fontWeight: "bold", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   priorityDot: { width: 10, height: 10, borderRadius: 5 },
-  siteText: { fontSize: 18, fontWeight: "bold", color: Colors.text, marginBottom: 4 },
-  clientText: { fontSize: 14, color: Colors.gray, marginBottom: 12 },
-  cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: 12 },
-  dateText: { fontSize: 13, color: Colors.gray, fontWeight: "500" },
+  siteText: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+  clientText: { fontSize: 14, marginBottom: 12 },
+  cardFooter: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderTopWidth: 1, paddingTop: 12 },
+  dateText: { fontSize: 13, fontWeight: "500" },
   deleteBtn: { padding: 4 },
   emptyContainer: { alignItems: "center", justifyContent: "center", paddingTop: 60 },
-  emptyText: { marginTop: 16, fontSize: 16, color: Colors.gray },
+  emptyText: { marginTop: 16, fontSize: 16 },
 });

@@ -6,15 +6,22 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "assigment",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryAddUsageDescription": "Allow Smart Survey to save photos to your gallery."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundColor": "#2563EB"
-      }
+      },
+      "permissions": [
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "output": "static",
@@ -38,6 +45,14 @@
         "expo-contacts",
         {
           "contactsPermission": "Allow Smart Survey to access your contacts."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Smart Survey to save photos to your gallery.",
+          "savePhotosPermission": "Allow Smart Survey to save photos to your gallery.",
+          "isAccessMediaLocationEnabled": true
         }
       ],
       [

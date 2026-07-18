@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ── Types (as JSDoc for simplicity) ──────────────────────────────────────────
 // Survey: { id, site, client, description, priority, date, status, notes, photo, location }
@@ -28,8 +29,39 @@ const INITIAL_SURVEYS = [
 ];
 
 export function SurveyProvider({ children }) {
-  const [surveys,      setSurveys]      = useState(INITIAL_SURVEYS);
-  const [pendingPhoto, setPendingPhoto] = useState(null);  // photo captured for current survey draft
+  const [surveys, setSurveys] = useState(INITIAL_SURVEYS);
+  const [pendingPhoto, setPendingPhoto] = useState(null); // photo captured for current survey draft
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadSurveys = async () => {
+      try {
+        const stored = await AsyncStorage.getItem("surveys");
+        if (stored) {
+          setSurveys(JSON.parse(stored));
+        }
+      } catch (e) {
+        console.error("Failed to load surveys:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSurveys();
+  }, []);
+
+  // Save surveys to AsyncStorage whenever they change
+  useEffect(() => {
+    const saveSurveys = async () => {
+      try {
+        await AsyncStorage.setItem("surveys", JSON.stringify(surveys));
+      } catch (e) {
+        console.error("Failed to save surveys:", e);
+      }
+    };
+    if (!loading) {
+      saveSurveys();
+    }
+  }, [surveys, loading]);
 
   // Add a new survey to the top of the list
   function addSurvey(survey) {
@@ -52,7 +84,7 @@ export function SurveyProvider({ children }) {
   }
 
   return (
-    <SurveyContext.Provider value={{ surveys, addSurvey, deleteSurvey, editSurvey, getSurvey, pendingPhoto, setPendingPhoto }}>
+    <SurveyContext.Provider value={{ surveys, addSurvey, deleteSurvey, editSurvey, getSurvey, pendingPhoto, setPendingPhoto, loading }}>
       {children}
     </SurveyContext.Provider>
   );

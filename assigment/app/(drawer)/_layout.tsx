@@ -4,7 +4,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { useRouter, usePathname } from "expo-router";
-import Colors from "@/constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 
 // All drawer menu items
 const MENU_ITEMS = [
@@ -20,6 +20,7 @@ const MENU_ITEMS = [
 function CustomDrawerContent(props) {
   const router   = useRouter();
   const pathname = usePathname();
+  const { colors } = useTheme();
 
   function navigate(route) {
     props.navigation.closeDrawer();
@@ -27,18 +28,21 @@ function CustomDrawerContent(props) {
   }
 
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
+    <DrawerContentScrollView {...props} contentContainerStyle={[
+      { flex: 1 },
+      { backgroundColor: colors.background }
+    ]}>
 
       {/* Blue profile header */}
-      <View style={styles.profileBox}>
+      <View style={[styles.profileBox, { backgroundColor: colors.primary }]}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>PM</Text>
+          <Text style={[styles.avatarText, { color: colors.primary }]}>PM</Text>
         </View>
         <Text style={styles.profileName}>Prathvik Mehra</Text>
-        <Text style={styles.profileSub}>Enrollment: 23CS001</Text>
+        <Text style={[styles.profileSub, { color: colors.primary === "#2563EB" ? "#BFDBFE" : "#2d3748" }]}>Enrollment: 23CS001</Text>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* Menu items */}
       <View style={styles.menuSection}>
@@ -49,13 +53,21 @@ function CustomDrawerContent(props) {
               key={item.label}
               style={({ pressed }) => [
                 styles.menuItem,
-                isActive && styles.menuItemActive,
-                pressed  && styles.menuItemPressed,
+                isActive && [styles.menuItemActive, { backgroundColor: colors.primary + "18" }],
+                pressed  && [styles.menuItemPressed, { backgroundColor: colors.border }],
               ]}
               onPress={() => navigate(item.route)}
             >
-              <Ionicons name={item.icon} size={22} color={isActive ? Colors.primary : Colors.gray} />
-              <Text style={[styles.menuLabel, isActive && styles.menuLabelActive]}>
+              <Ionicons 
+                name={item.icon} 
+                size={22} 
+                color={isActive ? colors.primary : colors.gray} 
+              />
+              <Text style={[
+                styles.menuLabel, 
+                { color: colors.text },
+                isActive && [styles.menuLabelActive, { color: colors.primary }]
+              ]}>
                 {item.label}
               </Text>
             </Pressable>
@@ -64,9 +76,9 @@ function CustomDrawerContent(props) {
       </View>
 
       {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Smart Survey & Inspection App</Text>
-        <Text style={styles.footerVersion}>v1.0  •  Modules 1 – 3</Text>
+      <View style={[styles.footer, { borderTopColor: colors.border }]}>
+        <Text style={[styles.footerText, { color: colors.gray }]}>Smart Survey & Inspection App</Text>
+        <Text style={[styles.footerVersion, { color: colors.gray }]}>v1.0  •  Modules 1 – 3</Text>
       </View>
 
     </DrawerContentScrollView>
@@ -75,7 +87,6 @@ function CustomDrawerContent(props) {
 
 export default function DrawerLayout() {
   return (
-    // GestureHandlerRootView is REQUIRED for the swipe gesture to work
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
         initialRouteName="(tabs)"
@@ -84,7 +95,7 @@ export default function DrawerLayout() {
           headerShown: false,
           drawerStyle:      { width: 280 },
           overlayColor:     "rgba(0,0,0,0.5)",
-          swipeEdgeWidth:   60,   // how wide the swipe zone is from the left edge
+          swipeEdgeWidth:   60,
         }}
       >
         <Drawer.Screen name="(tabs)"    options={{ drawerLabel: "Dashboard" }} />
@@ -99,7 +110,6 @@ export default function DrawerLayout() {
 
 const styles = StyleSheet.create({
   profileBox: {
-    backgroundColor: Colors.primary,
     padding: 24,
     paddingTop: 48,
     alignItems: "center",
@@ -113,10 +123,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
   },
-  avatarText:   { color: Colors.primary, fontSize: 24, fontWeight: "bold" },
+  avatarText:   { fontSize: 24, fontWeight: "bold" },
   profileName:  { color: "white",  fontSize: 17, fontWeight: "700" },
-  profileSub:   { color: "#BFDBFE", fontSize: 13, marginTop: 2 },
-  divider:      { height: 1, backgroundColor: Colors.border, marginVertical: 8, marginHorizontal: 16 },
+  profileSub:   { fontSize: 13, marginTop: 2 },
+  divider:      { height: 1, marginVertical: 8, marginHorizontal: 16 },
   menuSection:  { paddingHorizontal: 12, flex: 1 },
   menuItem: {
     flexDirection: "row",
@@ -127,19 +137,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     gap: 14,
   },
-  menuItemActive:  { backgroundColor: Colors.primary + "18" },
-  menuItemPressed: { backgroundColor: Colors.border },
-  menuLabel:       { fontSize: 15, fontWeight: "500", color: Colors.text },
-  menuLabelActive: { color: Colors.primary, fontWeight: "700" },
+  menuLabel:       { fontSize: 15, fontWeight: "500" },
+  menuLabelActive: { fontWeight: "700" },
   footer: {
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 24,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
     marginHorizontal: 12,
     marginTop: 8,
   },
-  footerText:    { color: Colors.gray, fontSize: 12, fontWeight: "500" },
-  footerVersion: { color: Colors.gray, fontSize: 11, marginTop: 2 },
+  footerText:    { fontSize: 12, fontWeight: "500" },
+  footerVersion: { fontSize: 11, marginTop: 2 },
 });

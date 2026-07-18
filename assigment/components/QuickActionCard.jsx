@@ -1,20 +1,25 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Colors from "../constants/Colors";
+import { useTheme } from "@/context/ThemeContext";
 
 // Reusable quick-action card — shows an icon, colour accent and title
 // Props: title (string), icon (Ionicons name), color (hex), onPress (function)
 export default function QuickActionCard({ title, icon, color, onPress }) {
+  const { colors } = useTheme();
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        pressed && styles.pressed,
+        { backgroundColor: colors.card },
+      ]}
       onPress={onPress}
     >
       {/* Coloured icon background circle */}
       <View style={[styles.iconBox, { backgroundColor: color + "20" }]}>
         <Ionicons name={icon} size={28} color={color} />
       </View>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
     </Pressable>
   );
 }
@@ -22,7 +27,6 @@ export default function QuickActionCard({ title, icon, color, onPress }) {
 const styles = StyleSheet.create({
   card: {
     width: "48%",
-    backgroundColor: Colors.card,
     padding: 18,
     borderRadius: 16,
     alignItems: "center",
@@ -53,7 +57,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "600",
-    color: Colors.text,
     textAlign: "center",
   },
 });
