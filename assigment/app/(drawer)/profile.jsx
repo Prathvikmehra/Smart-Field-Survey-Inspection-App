@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput, Image, ScrollView, Alert, ActivityIndicator } from "react-native";
 import AppHeader from "@/components/AppHeader";
 import { useTheme } from "@/context/ThemeContext";
