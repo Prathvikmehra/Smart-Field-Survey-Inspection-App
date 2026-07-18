@@ -22,7 +22,6 @@ export default function CameraScreen() {
 
   // expo-camera permission hook
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [mediaPermission, requestMediaPermission] = MediaLibrary.usePermissions({ permissions: ['photo'] });
 
   // UI states
   const [loading, setLoading] = useState(false); // capturing in progress
@@ -34,12 +33,10 @@ export default function CameraScreen() {
   // Save photo to gallery function
   const savePhotoToGallery = async (uri) => {
     try {
-      if (!mediaPermission?.granted) {
-        const { granted } = await requestMediaPermission();
-        if (!granted) {
-          Alert.alert("Permission needed", "Please grant media library permission to save photos");
-          return false;
-        }
+      const { status } = await MediaLibrary.requestPermissionsAsync(false); // false = don't ask for audio
+      if (status !== 'granted') {
+        Alert.alert("Permission needed", "Please grant media library permission to save photos");
+        return false;
       }
 
       await MediaLibrary.saveToLibraryAsync(uri);
