@@ -51,7 +51,7 @@ export default function Dashboard() {
             title="Camera"
             icon="camera-outline"
             color={colors.accent}
-            onPress={() => router.push("/camera")}
+            onPress={() => router.push("/(drawer)/(tabs)/camera")}
           />
           <QuickActionCard
             title="Location"
