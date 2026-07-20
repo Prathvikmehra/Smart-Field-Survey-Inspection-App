@@ -12,7 +12,7 @@ import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { ProfileProvider } from "@/context/ProfileContext";
 
 function ThemedStatusBar() {
-  const { isDark } = useTheme();
+  const { isDark } = useTheme() as any;
   return <StatusBar style={isDark ? "light" : "dark"} />;
 }
 

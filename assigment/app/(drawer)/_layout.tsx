@@ -2,6 +2,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { View, Text, Pressable, StyleSheet, Image, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import type { ComponentProps } from "react";
 import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { useRouter, usePathname } from "expo-router";
 import { useTheme } from "@/context/ThemeContext";
@@ -20,19 +21,19 @@ const MENU_ITEMS = [
   { label: "Settings",   icon: "settings-outline",   route: "/(drawer)/settings" },
 ];
 
-function CustomDrawerContent(props) {
+function CustomDrawerContent(props: any) {
   const router   = useRouter();
   const pathname = usePathname();
-  const { colors } = useTheme();
-  const { profile, loading } = useProfile();
+  const { colors } = useTheme() as any;
+  const { profile, loading } = useProfile() as any;
 
-  function navigate(route) {
+  function navigate(route: string) {
     props.navigation.closeDrawer();
-    router.push(route);
+    router.push(route as any);
   }
 
-  const getInitials = (name) => {
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  const getInitials = (name: string) => {
+    return name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
   return (
@@ -77,7 +78,7 @@ function CustomDrawerContent(props) {
               onPress={() => navigate(item.route)}
             >
               <Ionicons 
-                name={item.icon} 
+                name={item.icon as ComponentProps<typeof Ionicons>["name"]} 
                 size={22} 
                 color={isActive ? colors.primary : colors.gray} 
               />
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
   profileName:  { color: "white",  fontSize: 17, fontWeight: "700" },
   profileSub:   { fontSize: 13, marginTop: 2 },
   divider:      { height: 1, marginVertical: 8, marginHorizontal: 16 },
-  menuSection:  { paddingHorizontal: 12, flex: 1 },
+  menuSection:  { paddingHorizontal: 12, paddingBottom: 8 },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -165,15 +166,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     gap: 14,
   },
+  menuItemActive: {
+    borderLeftWidth: 0,
+  },
+  menuItemPressed: {
+    opacity: 0.85,
+  },
   menuLabel:       { fontSize: 15, fontWeight: "500" },
   menuLabelActive: { fontWeight: "700" },
   footer: {
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 24,
+    paddingBottom: 32,
     borderTopWidth: 1,
     marginHorizontal: 12,
-    marginTop: 8,
+    marginTop: 16,
   },
   footerText:    { fontSize: 12, fontWeight: "500" },
   footerVersion: { fontSize: 11, marginTop: 2 },

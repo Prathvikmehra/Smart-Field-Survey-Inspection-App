@@ -49,7 +49,7 @@ const darkColors = {
   success: "#4ADE80",
   warning: "#FBBF24",
   danger: "#F87171",
-  accent: "#A78BFA",
+  accent: "#0F172A",
 };
 
 const ThemeContext = createContext(null);
